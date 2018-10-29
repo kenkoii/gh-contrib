@@ -33,6 +33,14 @@ func (repo *InMemoryUserRepository) GetByUsername(username string) (*models.User
 	return repo.data[username], nil
 }
 
+func (repo *InMemoryUserRepository) GetAll() ([]*models.User, error) {
+	var list []*models.User
+	for _, j := range repo.data {
+		list = append(list, j)
+	}
+	return list, nil
+}
+
 func (repo *InMemoryUserRepository) Delete(username string) error {
 	if username == "" {
 		return fmt.Errorf("Username must not be empty")
