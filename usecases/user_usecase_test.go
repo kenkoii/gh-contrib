@@ -34,4 +34,30 @@ func TestUsecase(t *testing.T) {
 			t.Errorf("Wrong user fetched: %s", err.Error())
 		}
 	})
+
+	t.Run("GetAll and Delete", func(t *testing.T) {
+		want := 1
+		got, err := u.GetAll()
+		if err != nil {
+			t.Errorf("Get all error: %s", err.Error())
+		}
+
+		if len(got) != want {
+			t.Errorf("Wrong length: %s", err.Error())
+		}
+
+		want = 0
+		err = u.Delete("kenkoii")
+		if err != nil {
+			t.Errorf("Delete error %s", err.Error())
+		}
+
+		got, err = u.GetAll()
+		if err != nil {
+			t.Errorf("Get All error %s", err.Error())
+		}
+		if len(got) != want {
+			t.Errorf("Length should now be 0 %s", err.Error())
+		}
+	})
 }
