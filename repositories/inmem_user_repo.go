@@ -11,7 +11,9 @@ type InMemoryUserRepository struct {
 }
 
 func NewInMemoryUserRepository() *InMemoryUserRepository {
-	return &InMemoryUserRepository{}
+	return &InMemoryUserRepository{
+		data: make(map[string]*models.User),
+	}
 }
 
 func (repo *InMemoryUserRepository) Save(user *models.User) (*models.User, error) {
