@@ -1,13 +1,17 @@
 package ghcontrib
 
 import (
+	"fmt"
 	"net/http"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo"
 	mw "github.com/labstack/echo/middleware"
 )
 
 func init() {
+	//Require all fields
+	govalidator.SetFieldsRequiredByDefault(true)
 	e := echo.New()
 	e.Use(mw.Logger())
 
@@ -25,13 +29,34 @@ func mainHandler(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello World")
 }
 
+func getContrib(c echo.Context) error {
+	var contribReq ContribRequest
+
+	if err := c.Bind(&contribReq); err != nil {
+		return err
+	}
+
+	valid, err := govalidator.ValidateStruct(contribReq)
+	if err != nil {
+		return err
+	}
+
+	if valid == false {
+		return fmt.Errorf("Struct is invalid")
+	}
+	//Call Fetch req
+	fetchGithubContribs(contribReq)
+
+	return nil
+}
+
 type ContribRequest struct {
-	UserOrg     string
-	Repo        string
-	Author      string
-	DateSince   string
-	DateUntil   string
-	AccessToken string
+	UserOrg     string `json:"userOrg" valid:"alphanum"`
+	Repo        string `json:"repo" valid:"alphanum"`
+	Author      string `json:"author" valid:"alphanum"`
+	DateSince   string `json:"dateSince" valid:"alphanum"`
+	DateUntil   string `json:"dateUntil" valid:"alphanum"`
+	AccessToken string `json:"accessToken" valid:"alphanum"`
 }
 
 func fetchGithubContribs(ContribRequest) {
