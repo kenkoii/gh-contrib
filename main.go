@@ -8,7 +8,7 @@ import (
 	"os"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/kenkoii/a-fis-gh-contrib/models"
+	"github.com/kenkoii/gh-contrib/models"
 	"github.com/labstack/echo"
 	mw "github.com/labstack/echo/middleware"
 	"google.golang.org/appengine/urlfetch"
