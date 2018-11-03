@@ -1,6 +1,6 @@
 package repositories
 
-import "github.com/kenkoii/a-fis-gh-contrib/models"
+import "github.com/kenkoii/gh-contrib/models"
 
 type UserRepository interface {
 	Save(user *models.User) (*models.User, error)
