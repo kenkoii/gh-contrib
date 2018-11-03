@@ -3,7 +3,7 @@ package repositories
 import (
 	"fmt"
 
-	"github.com/kenkoii/a-fis-gh-contrib/models"
+	"github.com/kenkoii/gh-contrib/models"
 )
 
 type InMemoryUserRepository struct {
