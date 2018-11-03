@@ -1,12 +1,17 @@
 package ghcontrib
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/kenkoii/a-fis-gh-contrib/models"
 	"github.com/labstack/echo"
 	mw "github.com/labstack/echo/middleware"
+	"google.golang.org/appengine/urlfetch"
 )
 
 func init() {
@@ -19,7 +24,7 @@ func init() {
 	http.HandleFunc("/", e.ServeHTTP)
 }
 
-var url = `https://api.github.com/repos/%s/%s/commits?
+var baseUrl = `https://api.github.com/repos/%s/%s/commits?
 			access_token=%s
 			&since=%s
 			&until=%s
@@ -30,7 +35,7 @@ func mainHandler(c echo.Context) error {
 }
 
 func getContrib(c echo.Context) error {
-	var contribReq ContribRequest
+	var contribReq models.ContribRequest
 
 	if err := c.Bind(&contribReq); err != nil {
 		return err
@@ -45,11 +50,28 @@ func getContrib(c echo.Context) error {
 		return fmt.Errorf("Struct is invalid")
 	}
 	//Call Fetch req
-	fetchGithubContribs(contribReq)
+	gcr, err := fetchGithubContribs(c.Request().Context(), contribReq)
+	if err != nil {
+		return err
+	}
 
-	return nil
+	//Do something with gcr
+	return c.JSON(http.StatusOK, gcr)
 }
 
-func fetchGithubContribs(ContribRequest) {
+func fetchGithubContribs(c context.Context, cr models.ContribRequest) (models.GithubCommitsResponse, error) {
+	url := fmt.Sprintf(baseUrl, cr.UserOrg, os.Getenv("GH_TOKEN"), cr.DateSince, cr.DateUntil, cr.Author)
+	res, err := urlfetch.Client(c).Get(url)
+	if err != nil {
+		return nil, err
+	}
 
+	defer res.Body.Close()
+	var gcr models.GithubCommitsResponse
+
+	if err := json.NewDecoder(res.Body).Decode(&gcr); err != nil {
+		return nil, err
+	}
+
+	return gcr, nil
 }
