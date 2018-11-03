@@ -1,9 +1,0 @@
-runtime: go
-api_version: go1
-
-handlers:
-- url: /.*
-  script: _go_app
-
-env_variables:
-  GH_TOKEN: "12786ee065f178b56ba2c432cfaecd8fb44dc817"
