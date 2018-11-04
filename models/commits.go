@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type GithubCommitsResponse []struct {
+type GithubCommitsResponse struct {
 	Sha    string `json:"sha"`
 	NodeID string `json:"node_id"`
 	Commit struct {

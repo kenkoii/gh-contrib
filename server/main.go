@@ -69,8 +69,7 @@ func getContribHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, gcr)
 }
 
-func fetchGithubContribs(ctx context.Context, cr *models.ContribRequest) (models.GithubCommitsResponse, error) {
-	log.Infof(ctx, "Hello World")
+func fetchGithubContribs(ctx context.Context, cr *models.ContribRequest) ([]models.GithubCommitsResponse, error) {
 	url := fmt.Sprintf(baseUrl, cr.UserOrg, cr.Repo, cr.DateSince, cr.DateUntil, cr.Author, os.Getenv("GH_TOKEN"))
 	log.Infof(ctx, "Url: %s", url)
 	res, err := urlfetch.Client(ctx).Get(url)
@@ -79,7 +78,7 @@ func fetchGithubContribs(ctx context.Context, cr *models.ContribRequest) (models
 	}
 
 	defer res.Body.Close()
-	var gcr models.GithubCommitsResponse
+	var gcr []models.GithubCommitsResponse
 
 	if err := json.NewDecoder(res.Body).Decode(&gcr); err != nil {
 		return nil, err
