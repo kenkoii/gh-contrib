@@ -1,10 +1,10 @@
 package models
 
 type ContribRequest struct {
-	UserOrg   string `json:"userOrg" valid:"alphanum"`
-	Repo      string `json:"repo" valid:"alphanum"`
-	Author    string `json:"author" valid:"alphanum"`
-	DateSince string `json:"dateSince" valid:"alphanum"`
-	DateUntil string `json:"dateUntil" valid:"alphanum"`
+	UserOrg   string `json:"userOrg" valid:"ascii"`
+	Repo      string `json:"repo" valid:"ascii"`
+	Author    string `json:"author" valid:"ascii"`
+	DateSince string `json:"dateSince" valid:"ascii"`
+	DateUntil string `json:"dateUntil" valid:"ascii"`
 	// AccessToken string `json:"accessToken" valid:"alphanum"`
 }
