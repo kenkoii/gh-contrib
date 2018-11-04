@@ -42,9 +42,6 @@ func getContribHandler(c echo.Context) error {
 		DateSince: c.QueryParam("since"),
 		DateUntil: c.QueryParam("until"),
 	}
-	// if err := c.Bind(&contribReq); err != nil {
-	// 	return err
-	// }
 
 	log.Infof(ctx, "Req Body: %v", contribReq)
 
@@ -65,8 +62,19 @@ func getContribHandler(c echo.Context) error {
 		return err
 	}
 
+	contribs := make(map[string][]*models.DailyContrib)
+
+	for i := 0; i < len(gcr); i++ {
+		date := fmt.Sprintf("%s", gcr[i].Commit.Author.Date.Format("2006-01-02"))
+		dc := &models.DailyContrib{
+			Author: gcr[i].Commit.Author.Name,
+			Date:   date,
+		}
+		contribs[date] = append(contribs[date], dc)
+	}
+
 	//Do something with gcr
-	return c.JSON(http.StatusOK, gcr)
+	return c.JSON(http.StatusOK, contribs)
 }
 
 func fetchGithubContribs(ctx context.Context, cr *models.ContribRequest) ([]models.GithubCommitsResponse, error) {
