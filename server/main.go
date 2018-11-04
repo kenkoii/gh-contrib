@@ -27,11 +27,7 @@ func init() {
 	http.Handle("/", e)
 }
 
-var baseUrl = `https://api.github.com/repos/%s/%s/commits?
-			access_token=%s
-			&since=%s
-			&until=%s
-			&author=%s`
+var baseUrl = `https://api.github.com/repos/%s/%s/commits?since=%s&until=%s&author=%s&access_token=%s`
 
 func mainHandler(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello World")
@@ -39,11 +35,18 @@ func mainHandler(c echo.Context) error {
 
 func getContribHandler(c echo.Context) error {
 	ctx := appengine.NewContext(c.Request())
-	var contribReq models.ContribRequest
-
-	if err := c.Bind(&contribReq); err != nil {
-		return err
+	contribReq := &models.ContribRequest{
+		UserOrg:   c.QueryParam("userOrg"),
+		Repo:      c.QueryParam("repo"),
+		Author:    c.QueryParam("author"),
+		DateSince: c.QueryParam("since"),
+		DateUntil: c.QueryParam("until"),
 	}
+	// if err := c.Bind(&contribReq); err != nil {
+	// 	return err
+	// }
+
+	log.Infof(ctx, "Req Body: %v", contribReq)
 
 	valid, err := govalidator.ValidateStruct(contribReq)
 	if err != nil {
@@ -58,7 +61,7 @@ func getContribHandler(c echo.Context) error {
 	//Call Fetch req
 	gcr, err := fetchGithubContribs(ctx, contribReq)
 	if err != nil {
-		log.Errorf(ctx, "Fetch error")
+		log.Errorf(ctx, "Fetch error: %s", err.Error())
 		return err
 	}
 
@@ -66,9 +69,10 @@ func getContribHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, gcr)
 }
 
-func fetchGithubContribs(ctx context.Context, cr models.ContribRequest) (models.GithubCommitsResponse, error) {
+func fetchGithubContribs(ctx context.Context, cr *models.ContribRequest) (models.GithubCommitsResponse, error) {
 	log.Infof(ctx, "Hello World")
-	url := fmt.Sprintf(baseUrl, cr.UserOrg, os.Getenv("GH_TOKEN"), cr.DateSince, cr.DateUntil, cr.Author)
+	url := fmt.Sprintf(baseUrl, cr.UserOrg, cr.Repo, cr.DateSince, cr.DateUntil, cr.Author, os.Getenv("GH_TOKEN"))
+	log.Infof(ctx, "Url: %s", url)
 	res, err := urlfetch.Client(ctx).Get(url)
 	if err != nil {
 		return nil, err
