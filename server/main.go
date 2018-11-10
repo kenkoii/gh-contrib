@@ -68,7 +68,9 @@ func getContribHandler(c echo.Context) error {
 			return fmt.Errorf("Struct is invalid")
 		}
 
-		channel <- fetchGithubContribs(ctx, contribReq)
+		go func(ctx context.Context, contribReq *models.ContribRequest) {
+			channel <- fetchGithubContribs(ctx, contribReq)
+		}(ctx, contribReq)
 	}
 
 	for i := 0; i < len(contribReqs); i++ {
