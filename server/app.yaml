@@ -6,4 +6,4 @@ handlers:
   script: _go_app
 
 env_variables:
-  GH_TOKEN: "ba16d2ec06b75af324e953b6f1807a2592b4e4da"
+  # GH_TOKEN: "[GITHUB TOKEN OR PASS USING `--env_var ENV_VARIABLE=VALUE` flag]"

@@ -66,11 +66,22 @@ func getContribHandler(c echo.Context) error {
 
 	for i := 0; i < len(gcr); i++ {
 		date := fmt.Sprintf("%s", gcr[i].Commit.Author.Date.Format("2006-01-02"))
-		dc := &models.DailyContrib{
-			Author: gcr[i].Commit.Author.Name,
-			Date:   date,
+
+		var found bool
+
+		for _, v := range contribs[date] {
+			if v.Author == gcr[i].Commit.Author.Name {
+				v.Commits++
+				found = true
+			}
 		}
-		contribs[date] = append(contribs[date], dc)
+		if !found {
+			dc := &models.DailyContrib{
+				Author:  gcr[i].Commit.Author.Name,
+				Commits: 1,
+			}
+			contribs[date] = append(contribs[date], dc)
+		}
 	}
 
 	//Do something with gcr
